@@ -154,6 +154,13 @@ for h = 1:loopcount
         
         % add tx in flight from previous round to mempool and inv of its destination
         for i = 1:nodecount
+            if ~relay % snuff out from inflight if counterpart present in mempool
+                if ismember(1001,coinnet(i).mempool)
+                    coinnet(i).inflight(coinnet(i).inflight == 1002) = [];
+                elseif ismember(1002,coinnet(i).mempool)
+                    coinnet(i).inflight(coinnet(i).inflight == 1001) = [];
+                end
+            end
             coinnet(i).mempool = unique([coinnet(i).mempool coinnet(i).inflight],'stable');
             if ~relay % tx2 will never relay if tx1 is already seen and no ds relay
                 coinnet(i).mempool = ridsecond(coinnet(i).mempool);
